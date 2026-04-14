@@ -1,0 +1,21 @@
+[project]
+name = "event_api"
+version = "0.1.0"
+description = "Event Booking API"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "motor",
+    "pymongo",
+    "pydantic-settings",
+    "python-dotenv",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "email-validator",
+    "python-multipart",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
