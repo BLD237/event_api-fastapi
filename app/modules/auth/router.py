@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, timezone
 
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.config import get_settings
 from app.db.session import get_profiles_collection, get_users_collection
@@ -28,51 +27,19 @@ from app.modules.auth.schemas.models import (
 )
 from app.modules.auth.services.auth_service import (
     decode_access_token,
-    hash_password,
     hash_otp_code,
+    hash_password,
     verify_password,
     create_access_token,
     generate_otp_code,
 )
 from app.services.email import EmailService
+from app.modules.auth.dependencies import get_current_user, bearer_scheme
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-bearer_scheme = HTTPBearer(auto_error=True)
 
-
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
-    users_collection=Depends(get_users_collection),
-    settings=Depends(get_settings),
-):
-    payload = decode_access_token(token=credentials.credentials, settings=settings)
-    user_id = payload.get("sub")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        )
-
-    try:
-        oid = ObjectId(user_id)
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        )
-
-    user = await find_user_by_id(user_id=oid, users_collection=users_collection)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        )
-
-    return user
-
-
-@router.post("/register", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=ApiResponse[AuthDataResponse], status_code=status.HTTP_201_CREATED)
 async def register(
     body: RegisterRequest,
     users_collection=Depends(get_users_collection),
@@ -143,7 +110,7 @@ async def register(
     )
 
 
-@router.post("/login", response_model=ApiResponse)
+@router.post("/login", response_model=ApiResponse[AuthDataResponse])
 async def login(
     body: LoginRequest,
     users_collection=Depends(get_users_collection),

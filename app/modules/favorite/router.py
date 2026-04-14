@@ -4,13 +4,13 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.response import ApiResponse, success_response
 from app.db.session import get_event_favorites_collection, get_events_collection
-from app.modules.auth.router import get_current_user
+from app.modules.auth.dependencies import get_current_user
 from app.modules.event.router import map_db_to_event
 
 router = APIRouter(prefix="/users/me/favorites", tags=["favorites"])
 
 
-@router.get("", response_model=ApiResponse)
+@router.get("", response_model=ApiResponse[dict])
 async def get_favorites(
     current_user=Depends(get_current_user),
     favorites_collection=Depends(get_event_favorites_collection),
@@ -35,7 +35,7 @@ async def get_favorites(
     return success_response(data={"favorites": favorites})
 
 
-@router.post("/{eventId}", response_model=ApiResponse)
+@router.post("/{eventId}", response_model=ApiResponse[dict])
 async def add_favorite(
     eventId: str,
     current_user=Depends(get_current_user),
@@ -55,7 +55,7 @@ async def add_favorite(
     return success_response(message="Event added to favorites")
 
 
-@router.delete("/{eventId}", response_model=ApiResponse)
+@router.delete("/{eventId}", response_model=ApiResponse[dict])
 async def remove_favorite(
     eventId: str,
     current_user=Depends(get_current_user),

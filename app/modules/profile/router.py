@@ -4,7 +4,7 @@ from typing import Optional
 
 from app.core.response import ApiResponse, success_response
 from app.db.session import get_profiles_collection, get_users_collection
-from app.modules.auth.router import get_current_user
+from app.modules.auth.dependencies import get_current_user
 from app.modules.profile.crud.profiles import (
     find_profile_by_user_id,
     update_profile_by_user_id,
@@ -14,7 +14,7 @@ from app.modules.profile.schemas.models import ProfileResponse, ProfileUpdateReq
 router = APIRouter(prefix="/users/me", tags=["profile"])
 
 
-@router.get("", response_model=ApiResponse)
+@router.get("", response_model=ApiResponse[dict])
 async def get_my_profile(
     current_user=Depends(get_current_user),
     profiles_collection=Depends(get_profiles_collection),
@@ -37,7 +37,7 @@ async def get_my_profile(
     )
 
 
-@router.put("", response_model=ApiResponse)
+@router.put("", response_model=ApiResponse[dict])
 async def update_my_profile(
     body: ProfileUpdateRequest,
     current_user=Depends(get_current_user),

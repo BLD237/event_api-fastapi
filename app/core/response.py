@@ -1,19 +1,21 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar, Generic
 
 from pydantic import BaseModel
 
+T = TypeVar("T")
 
-class ApiResponse(BaseModel):
+
+class ApiResponse(BaseModel, Generic[T]):
     status: str
     message: Optional[str] = None
-    data: Optional[Any] = None
+    data: Optional[T] = None
 
 
 def success_response(
-    *, message: Optional[str] = None, data: Optional[Any] = None
-) -> ApiResponse:
+    *, message: Optional[str] = None, data: Optional[T] = None
+) -> ApiResponse[T]:
     return ApiResponse(
         status="success",
         message=message,
@@ -22,8 +24,8 @@ def success_response(
 
 
 def error_response(
-    *, message: str, data: Optional[Any] = None
-) -> ApiResponse:
+    *, message: str, data: Optional[T] = None
+) -> ApiResponse[T]:
     return ApiResponse(
         status="error",
         message=message,

@@ -4,7 +4,7 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.response import ApiResponse, success_response
 from app.db.session import get_bookings_collection, get_events_collection
-from app.modules.auth.router import get_current_user
+from app.modules.auth.dependencies import get_current_user
 from app.modules.booking.schemas import (
     BookingCreateRequest,
     BookingResponseData,
@@ -16,7 +16,7 @@ from app.modules.event.router import map_db_to_event
 router = APIRouter(prefix="", tags=["bookings"]) # Prefix handled at main or inclusion
 
 
-@router.post("/bookings", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/bookings", response_model=ApiResponse[BookingResponseData], status_code=status.HTTP_201_CREATED)
 async def book_tickets(
     body: BookingCreateRequest,
     current_user=Depends(get_current_user),
@@ -39,7 +39,7 @@ async def book_tickets(
     )
 
 
-@router.get("/users/me/bookings", response_model=ApiResponse)
+@router.get("/users/me/bookings", response_model=ApiResponse[dict])
 async def get_my_bookings(
     current_user=Depends(get_current_user),
     bookings_collection=Depends(get_bookings_collection),
@@ -64,7 +64,7 @@ async def get_my_bookings(
     return success_response(data={"bookings": bookings})
 
 
-@router.get("/bookings/{bookingId}", response_model=ApiResponse)
+@router.get("/bookings/{bookingId}", response_model=ApiResponse[dict])
 async def get_booking_details(
     bookingId: str,
     current_user=Depends(get_current_user),
@@ -99,7 +99,7 @@ async def get_booking_details(
     )
 
 
-@router.post("/bookings/{bookingId}/cancel", response_model=ApiResponse)
+@router.post("/bookings/{bookingId}/cancel", response_model=ApiResponse[dict])
 async def cancel_booking(
     bookingId: str,
     current_user=Depends(get_current_user),

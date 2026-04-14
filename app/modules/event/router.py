@@ -9,7 +9,7 @@ from app.db.session import (
     get_event_favorites_collection,
     get_events_collection,
 )
-from app.modules.auth.router import get_current_user
+from app.modules.auth.dependencies import get_current_user
 from app.modules.event.crud.events import (
     find_event_by_id,
     list_events,
@@ -56,7 +56,7 @@ def map_db_to_event(doc: dict) -> EventObject:
     )
 
 
-@router.get("", response_model=ApiResponse)
+@router.get("", response_model=ApiResponse[EventListResponseData])
 async def get_all_events(
     search: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
@@ -89,7 +89,7 @@ async def get_all_events(
     )
 
 
-@router.get("/featured", response_model=ApiResponse)
+@router.get("/featured", response_model=ApiResponse[dict])
 async def get_featured_events(
     events_collection=Depends(get_events_collection),
 ):
@@ -114,7 +114,7 @@ async def get_featured_events(
     return success_response(data={"featuredEvents": events})
 
 
-@router.get("/popular", response_model=ApiResponse)
+@router.get("/popular", response_model=ApiResponse[dict])
 async def get_popular_events(
     events_collection=Depends(get_events_collection),
 ):
@@ -126,7 +126,7 @@ async def get_popular_events(
     return success_response(data={"popularEvents": events})
 
 
-@router.get("/categories", response_model=ApiResponse)
+@router.get("/categories", response_model=ApiResponse[dict])
 async def get_categories():
     categories = [
         CategoryObject(id="cat-1", name="Art", iconUrl="https://example.com/icons/art.png"),
@@ -137,7 +137,7 @@ async def get_categories():
     return success_response(data={"categories": [c.model_dump() for c in categories]})
 
 
-@router.get("/explore", response_model=ApiResponse)
+@router.get("/explore", response_model=ApiResponse[ExploreResponseData])
 async def get_explore_data(
     lat: Optional[float] = Query(None),
     lng: Optional[float] = Query(None),
@@ -171,7 +171,7 @@ async def get_explore_data(
     return success_response(data=data.model_dump())
 
 
-@router.get("/{id}", response_model=ApiResponse)
+@router.get("/{id}", response_model=ApiResponse[dict])
 async def get_event_details(
     id: str,
     events_collection=Depends(get_events_collection),

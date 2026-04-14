@@ -8,7 +8,7 @@ from typing import Optional
 
 from app.core.response import ApiResponse, success_response
 from app.db.session import get_reviews_collection, get_events_collection, get_bookings_collection
-from app.modules.auth.router import get_current_user
+from app.modules.auth.dependencies import get_current_user
 from app.modules.event.router import map_db_to_event
 
 router = APIRouter(prefix="", tags=["reviews"])
@@ -19,7 +19,7 @@ class ReviewSubmitRequest(BaseModel):
     reviewText: str
 
 
-@router.get("/users/me/reviews", response_model=ApiResponse)
+@router.get("/users/me/reviews", response_model=ApiResponse[dict])
 async def get_my_reviews(
     current_user=Depends(get_current_user),
     reviews_collection=Depends(get_reviews_collection),
@@ -49,7 +49,7 @@ async def get_my_reviews(
     return success_response(data={"reviews": reviews})
 
 
-@router.get("/users/me/reviews/pending", response_model=ApiResponse)
+@router.get("/users/me/reviews/pending", response_model=ApiResponse[dict])
 async def get_pending_reviews(
     current_user=Depends(get_current_user),
     bookings_collection=Depends(get_bookings_collection),
@@ -85,7 +85,7 @@ async def get_pending_reviews(
     return success_response(data={"pendingReviews": pending})
 
 
-@router.post("/events/{eventId}/reviews", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/events/{eventId}/reviews", response_model=ApiResponse[dict], status_code=status.HTTP_201_CREATED)
 async def submit_review(
     eventId: str,
     body: ReviewSubmitRequest,

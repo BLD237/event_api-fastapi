@@ -71,11 +71,11 @@ async def logging_middleware(request: Request, call_next):
     
     return response
 
-@app.get("/")
+@app.get("/", response_model=ApiResponse[dict])
 async def root():
     return success_response(message="Event API v1.0.0. Use /api/v1/ endpoints")
 
-@app.post("/db/init", response_model=ApiResponse, status_code=status.HTTP_200_OK)
+@app.post("/db/init", response_model=ApiResponse[dict], status_code=status.HTTP_200_OK)
 async def init_db():
     users_collection = get_users_collection()
     profiles_collection = get_profiles_collection()
