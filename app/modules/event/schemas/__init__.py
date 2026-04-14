@@ -1,25 +1,21 @@
 from app.modules.event.schemas.models import (
+    EventObject,
+    EventListResponseData,
+    CategoryObject,
+    ExploreResponseData,
+    TrendingSearch,
+    NearbyVenue,
     EventCreateRequest,
-    EventListQuery,
-    EventResponse,
-    EventStatus,
     EventUpdateRequest,
-)
-from app.modules.event.schemas.interactions import (
-    FavoriteResponseData,
-    FavoritesListItem,
-    LikeFavoriteCounts,
-    LikeResponseData,
 )
 
 __all__ = [
+    "EventObject",
+    "EventListResponseData",
+    "CategoryObject",
+    "ExploreResponseData",
+    "TrendingSearch",
+    "NearbyVenue",
     "EventCreateRequest",
     "EventUpdateRequest",
-    "EventResponse",
-    "EventListQuery",
-    "EventStatus",
-    "LikeResponseData",
-    "FavoriteResponseData",
-    "LikeFavoriteCounts",
-    "FavoritesListItem",
 ]
