@@ -4,9 +4,13 @@ from datetime import datetime, timedelta, timezone
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Simple script to seed the database with sample data
-MONGODB_URI = "mongodb+srv://Vercel-Admin-event_db:5zu9TBoE47XetNE3@event-db.bvfx2ae.mongodb.net/?retryWrites=true&w=majority"
-MONGODB_DB = "event_api"
+MONGODB_URI = os.getenv("MONGODB_URI")
+MONGODB_DB = os.getenv("MONGODB_DB", "event_api")
 
 # Pre-calculated bcrypt hash for 'password123'
 PASSWORD_HASH = "$2b$12$6/p667v.v10o8hRj2p2o2.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV" 
