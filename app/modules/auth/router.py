@@ -34,6 +34,7 @@ from app.modules.auth.services.auth_service import (
     create_access_token,
     generate_otp_code,
 )
+from app.services.email import EmailService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -93,17 +94,24 @@ async def register(
 
     password_hash = hash_password(body.password)
 
+    otp_code = generate_otp_code(length=settings.otp_length)
+    otp_code_hash = hash_otp_code(otp_code)
+    otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.otp_expire_minutes)
+
     user = await create_user(
         email=body.email,
         password_hash=password_hash,
         full_name=body.name,
         roles=["user"],
-        is_verified=True,  # Auto-verify for now as per simple specs (or we can use OTP)
-        otp_code_hash=None,
-        otp_expires_at=None,
+        is_verified=False,
+        otp_code_hash=otp_code_hash,
+        otp_expires_at=otp_expires_at,
         users_collection=users_collection,
         settings=settings,
     )
+
+    # Send OTP email
+    email_sent = await EmailService.send_otp_email(to_email=user["email"], otp_code=otp_code)
 
     # Initialize profile document on signup.
     profile = await create_profile(
@@ -126,7 +134,12 @@ async def register(
     )
 
     return success_response(
-        data=AuthDataResponse(token=token, user=user_data).model_dump()
+        message="Created successfully. Please verify your email with the OTP sent.",
+        data={
+            "token": token,
+            "user": user_data.model_dump(),
+            "otp_sent": email_sent
+        }
     )
 
 
@@ -196,11 +209,11 @@ async def send_otp(
         users_collection=users_collection,
     )
 
-    # In a real app, send email here. In debug, we can expose it if needed.
-    debug_expose = settings.app_env == "development"
+    await EmailService.send_otp_email(to_email=user["email"], otp_code=otp_code)
+
     return success_response(
         message="OTP sent successfully to the provided email",
-        data={"otp_code": otp_code if debug_expose else None}
+        data={"otp_sent": True}
     )
 
 
@@ -257,6 +270,8 @@ async def forgot_password(
         otp_expires_at=otp_expires_at,
         users_collection=users_collection,
     )
+
+    await EmailService.send_password_reset_email(to_email=user["email"], otp_code=otp_code)
 
     return success_response(message="Password reset instructions sent to email")
 

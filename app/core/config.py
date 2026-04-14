@@ -24,6 +24,15 @@ class Settings(BaseSettings):
 
     storage_upload_max_mb: int = 15
     storage_upload_max_bytes: int = 15 * 1024 * 1024
+
+    # Email Settings
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    mail_from: str | None = None
+    mail_from_name: str = "Event Application"
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
