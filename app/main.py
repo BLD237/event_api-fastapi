@@ -33,17 +33,12 @@ configure_logging()
 
 app = FastAPI(title="Event Application API", version="1.0.0")
 
-# Prefix all routes with /api/v1 as per specs
-api_v1 = FastAPI()
-
-api_v1.include_router(auth_router)
-api_v1.include_router(event_router)
-api_v1.include_router(booking_router)
-api_v1.include_router(favorite_router)
-api_v1.include_router(review_router)
-api_v1.include_router(profile_router)
-
-app.mount("/api/v1", api_v1)
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(event_router, prefix="/api/v1")
+app.include_router(booking_router, prefix="/api/v1")
+app.include_router(favorite_router, prefix="/api/v1")
+app.include_router(review_router, prefix="/api/v1")
+app.include_router(profile_router, prefix="/api/v1")
 
 # Serve uploaded files
 storage_dir = Path(__file__).resolve().parents[1] / "storage"
@@ -111,3 +106,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
         status_code=500, 
         content=error_response(message="Internal server error").model_dump(mode="json")
     )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
