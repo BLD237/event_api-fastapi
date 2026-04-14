@@ -1,11 +1,10 @@
 from app.modules.auth.schemas.models import (
     LoginRequest,
     VerifyOtpRequest,
-    ResendOtpRequest,
+    SendOtpRequest,
     AdminCreateUserRequest,
     RegisterRequest,
     UpdateRoleRequest,
-    TokenResponse,
     UserResponse,
 )
 
@@ -13,9 +12,8 @@ __all__ = [
     "RegisterRequest",
     "LoginRequest",
     "VerifyOtpRequest",
-    "ResendOtpRequest",
+    "SendOtpRequest",
     "AdminCreateUserRequest",
     "UpdateRoleRequest",
-    "TokenResponse",
     "UserResponse",
 ]
