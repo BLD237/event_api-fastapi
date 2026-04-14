@@ -81,7 +81,7 @@ async def register(
     email_sent = await EmailService.send_otp_email(to_email=user["email"], otp_code=otp_code)
 
     # Initialize profile document on signup.
-    profile = await create_profile(
+    await create_profile(
         user_id=user["_id"],
         full_name=body.name,
         display_name=body.name,
@@ -91,21 +91,11 @@ async def register(
         profiles_collection=profiles_collection,
     )
 
-    token = create_access_token(subject=str(user["_id"]), settings=settings)
-    
-    user_data = UserObject(
-        id=str(user["_id"]),
-        name=body.name,
-        email=user["email"],
-        avatarUrl=profile.get("avatar_url"),
-    )
-
     return success_response(
-        message="Created successfully. Please verify your email with the OTP sent.",
+        message="Registration successful. Please check your email for a verification code.",
         data={
-            "token": token,
-            "user": user_data.model_dump(),
-            "otp_sent": email_sent
+            "email": user["email"],
+            "otp_sent": email_sent,
         }
     )
 
@@ -128,6 +118,12 @@ async def login(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
+        )
+
+    if not user.get("is_verified", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account not verified. Please verify your email before logging in.",
         )
 
     token = create_access_token(subject=str(user["_id"]), settings=settings)
