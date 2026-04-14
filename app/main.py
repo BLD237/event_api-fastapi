@@ -40,9 +40,17 @@ app.include_router(favorite_router, prefix="/api/v1")
 app.include_router(review_router, prefix="/api/v1")
 app.include_router(profile_router, prefix="/api/v1")
 
-# Serve uploaded files
+# Serve uploaded files if directory exists
 storage_dir = Path(__file__).resolve().parents[1] / "storage"
-app.mount("/storage-files", StaticFiles(directory=storage_dir), name="storage-files")
+if not storage_dir.exists():
+    try:
+        storage_dir.mkdir(exist_ok=True)
+    except Exception:
+        # On some platforms (like Vercel), the FS is read-only
+        pass
+
+if storage_dir.exists():
+    app.mount("/storage-files", StaticFiles(directory=storage_dir), name="storage-files")
 
 logger = logging.getLogger("event_api.http")
 

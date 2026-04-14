@@ -3,13 +3,13 @@ import os
 from datetime import datetime, timedelta, timezone
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
-from passlib.context import CryptContext
 
 # Simple script to seed the database with sample data
 MONGODB_URI = "mongodb+srv://Vercel-Admin-event_db:5zu9TBoE47XetNE3@event-db.bvfx2ae.mongodb.net/?retryWrites=true&w=majority"
 MONGODB_DB = "event_api"
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Pre-calculated bcrypt hash for 'password123'
+PASSWORD_HASH = "$2b$12$6/p667v.v10o8hRj2p2o2.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV" 
 
 async def seed():
     client = AsyncIOMotorClient(MONGODB_URI)
@@ -26,7 +26,7 @@ async def seed():
         print("Creating sample user Jane Doe...")
         user_doc = {
             "email": "jane@example.com",
-            "password_hash": pwd_context.hash("securepassword123"),
+            "password_hash": PASSWORD_HASH,
             "full_name": "Jane Doe",
             "roles": ["user"],
             "role": "user",
