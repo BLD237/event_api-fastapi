@@ -8,10 +8,10 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_debug: bool = False
 
-    mongodb_uri: str
+    mongodb_uri: str = ""
     mongodb_db: str = "event_api"
 
-    jwt_secret_key: str
+    jwt_secret_key: str = "placeholder_key_change_me_in_production"
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 60
 

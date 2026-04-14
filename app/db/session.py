@@ -8,6 +8,8 @@ from app.core.config import get_settings
 @lru_cache(maxsize=1)
 def get_motor_client() -> AsyncIOMotorClient:
     settings = get_settings()
+    if not settings.mongodb_uri:
+        raise ValueError("MONGODB_URI environment variable is not set")
     return AsyncIOMotorClient(settings.mongodb_uri)
 
 
